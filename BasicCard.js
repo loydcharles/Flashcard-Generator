@@ -1,4 +1,4 @@
-// Creates a Basic Card Constructor
+// Creates a Basic Constructor
 var BasicCard = function(front, back) {
   this.front = front;
   this.back = back;
