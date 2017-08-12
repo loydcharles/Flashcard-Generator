@@ -84,15 +84,15 @@ function addClozeCard() {
 var playBasicCardGame = function() {
 	count = 0;
 	console.log("\nPlay Basic Card Game!\n");	
-	while (count < basicCard.length) {	    
+	while (count < clozeCard.length) {	    
 	    inquirer.prompt([
 	      {
 	      	type: "input",
 	        name: "name",
-	        message: JSON.stringify(basicCard[count].front)
+	        message: JSON.stringify(clozeCard[count].partial)
 	      }
 	    ]).then(function(answers) {	    	
-	    	if(answers.name === JSON.stringify(basicCard[count].back)) {
+	    	if(answers.name === JSON.stringify(clozeCard[count].cloze)) {
 	    		correctGuesses++;
 	    	}
 	    	else {
@@ -107,7 +107,7 @@ var playBasicCardGame = function() {
 
 var playClozeCardGame = function() {
 	count = 0;
-	console.log("\nPlay Basic Card Game!\n");	
+	console.log("\nPlay Cloze Card Game!\n");	
 	while (count < basicCard.length) {	    
 	    inquirer.prompt([
 	      {
