@@ -49,13 +49,13 @@ function start() {
       {
         type: "list",
         name: "option",
-        message: "\nStarting Flash Card Generator!",
-        choices: ["Start BasicCard game", "Start ClozeCard game", "Add a Card"]
+        message: "\nStarting Flash Card Generator!\n",
+        choices: ["Start BasicCard game", "Start ClozeCard game", "Add a Basic Card", "Add a Cloze Card", "Exit"]
       }
     ]).then(function(gameMenu) {
-    	console.log("Selection Option:" + gameMenu.option);
-
-    	if(gameMenu.option === "Start BasicCard game") {
+    	console.log("Selected Option:" + gameMenu.option);
+    	count = 0;
+    	if(gameMenu.option === "Start BasicCard game") {    		
     		console.log("\nPlay Basic Card Game!\n");
     		playBasicCardGame();
     	}  	
@@ -63,31 +63,33 @@ function start() {
     		console.log("\nPlay Cloze Card Game!\n");
     		playClozeCardGame();
     	}
-    	else if(gameMenu.option === "Add a Card") {
+    	else if(gameMenu.option === "Add a Basic Card") {
     		console.log("\nAdding a Basic Card!\n");
-    		addCard();
+    		addBasicCard();
+    	}
+    	else if(gameMenu.option === "Add a Cloze Card") {
+    		console.log("\nAdding a Cloze Card!\n");
+    		addClozeCard();
+    	}
+    	else if(gameMenu.option === "Exit") {
+    		console.log("\nEXITING....\n");
+    		process.exit(-1);
     	}
 	});
 };
 
-function addCard() {
+function addBasicCard() {
 
 	inquirer.prompt([
-	  {
-	  	type: "checkbox",
-    	name: "cardChoice",
-    	message: "Which deck do you want to add the new card?",
-    	choices: ["Basic Card", "Cloze Card"]
-	  },
       {
       	type: "input",
         name: "front",
-        message: "Please enter a question for the basic card to display in the front of the card"
+        message: "Please enter a question for the basic card to display in the front of the card:"
       },
       {
       	type: "input",
         name: "back",
-        message: "Please enter a answer for the basic card to display in the back of the card"
+        message: "Please enter a answer for the basic card to display in the back of the card:"
       },
       {
         type: "confirm",
@@ -100,22 +102,62 @@ function addCard() {
         message: "Would you like to add another questions?"
       }
     ]).then(function(answers) {	  
-	   	if(answers.confirm) {
-	   		if (answers.cardChoice === "Basic Card") {
-	   		    basicCard.push(new BasicCard(answers.front, answers.back));
-	   		   	console.log(basicCard);	
-	   		}
-	   		else if (answers.cardChoice === "Cloze Card") {
-	   		    clozeCard.push(new ClozeCard(answers.front, answers.back));
-	   		    console.log(clozeCard);
-	   		}
-
+	   	if(answers.confirm) {	   		
+			basicCard.push(new BasicCard(answers.front, answers.back));
+	   		console.log(basicCard);		   	
     	}
     	if(answers.continue) {
     		console.log("Adding another card");
-	   		addCard();  
+	   		addBasicCard();  
     	}
-	});
+    	else {
+    		start();
+    	}    	
+
+	});	
+}
+
+function addClozeCard() {
+
+	inquirer.prompt([
+      {
+      	type: "input",
+        name: "fullText",
+        message: "Please enter a full Text for the Cloze Card:"
+      },
+      {
+      	type: "input",
+        name: "cloze",
+        message: "Please enter an answer for the Cloze Card:"
+      },
+      {
+        type: "confirm",
+        name: "confirm",
+        message: "Are you sure to add the above question to the Cloze Card?"
+      },
+      {
+        type: "confirm",
+ 		name: "continue",
+        message: "Would you like to add another questions?"
+      }
+    ]).then(function(answers) {	  
+	   	if(answers.confirm) {	   		
+			if(answers.fullText.includes(answers.cloze)) {
+				clozeCard.push(new ClozeCard(answers.fullText, answers.cloze));
+	   			console.log(clozeCard);
+			}
+			else {
+				console.log(cloze + " doesn't appear in " + fullText);
+			}				   	
+    	}
+    	if(answers.continue) {
+    		console.log("Adding another card");
+	   		addClozeCard();  
+    	}
+    	else {
+    		start();
+    	}    	
+	});	
 }
 
 var playBasicCardGame = function() {
@@ -134,10 +176,15 @@ var playBasicCardGame = function() {
 	    		console.log(answers.name + " is wrong answer");
 	    		console.log(basicCard[count].back + " is the correct answer");
 	    	}
-	    	count++;
-			playBasicCardGame();
+	    	count++; //increase the counter
+			playBasicCardGame(); // recursive
+
+			//start the game agin and give the user option
+			if(count === basicCard.length) {
+				start();				
+			}
 		});
-	}
+	}	
 };
 
 var playClozeCardGame = function() {
@@ -158,7 +205,12 @@ var playClozeCardGame = function() {
 	    	}
 	    	count++;
 			playClozeCardGame();
+
+			//start the game agin and give the user option
+			if(count === clozeCard.length) {
+				start();				
+			}
 		});
-	}
+	}	
 };
 
